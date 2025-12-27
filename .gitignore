@@ -29,3 +29,6 @@ target/generated-sources/
 target/maven-archiver/
 target/maven-status/
 META-INF
+secureData*.txt
+logfile.txt
+rmc_log.txt
