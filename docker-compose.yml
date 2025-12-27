@@ -1,30 +1,46 @@
-version: '2'
+version: '3.8'
+
 services:
   web:
-    image: tomcat:8
+    build: .
     ports:
       - "8080:8080"
     depends_on:
-      - "db"
+      db:
+        condition: service_healthy
     environment:
-      - "SPRING_PROFILES_ACTIVE=docker"
-    volumes:
-      #- ./out/artifacts/ROOT/ROOT.war:/usr/local/tomcat/webapps/ROOT.war:z
-      #- ./out/artifacts/Richkware_Manager_Server/Richkware-Manager-Server.war:/usr/local/tomcat/webapps/Richkware-Manager-Server.war:z
-      #- ./target/Richkware-Manager-Server :/usr/local/tomcat/webapps/Richkware-Manager-Server_EXP:z
-      - ./target/Richkware-Manager-Server.war:/usr/local/tomcat/webapps/Richkware-Manager-Server.war:z
-
-    #restart: always
-    #restart: on-failure
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USERNAME=richk
+      - DB_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-ChangeThisSecureKey123!}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/Richkware-Manager-Server/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   db:
-    image: mysql:5.7
+    image: mysql:8.0
     ports:
       - "3306:3306"
     volumes:
-      - ./init.sql:/data/application/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=richk
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
       - MYSQL_DATABASE=richkware
       - MYSQL_USER=richk
-      - MYSQL_PASSWORD=richk
+      - MYSQL_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

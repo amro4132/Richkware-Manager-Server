@@ -1,18 +1,19 @@
-# Base image with Tomcat 9 and JRE 11
-FROM tomcat:9.0-jdk11-openjdk
+FROM tomcat:9.0-jdk17-temurin
 
-# Deprecated maintainer instruction replacement
 LABEL maintainer="Richk <richkmeli@gmail.com>"
 
-# Remove default Tomcat apps
 RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-# Copy the built WAR file to Tomcat webapps directory
 COPY target/*.war /usr/local/tomcat/webapps/Richkware-Manager-Server.war
-
 
 EXPOSE 8080
 
+ENV DB_HOST=db \
+    DB_PORT=3306 \
+    DB_USERNAME=root \
+    DB_PASSWORD=changeme \
+    ENCRYPTION_KEY=changeme \
+    DEBUG_MODE=false
 
-EXPOSE 3306:3306
-EXPOSE 8080:80
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8080/Richkware-Manager-Server/ || exit 1

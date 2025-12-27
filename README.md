@@ -29,9 +29,20 @@ RMS follows REST principles. The table below outlines the HTTP methods implement
 
 ## Requirements
 
-- **Java 11** or higher
+- **Java 17** or higher
 - **Maven**
-- **Docker** (Recommended) or Tomcat 9+ and MySQL
+- **Docker** (Recommended) or Tomcat 9+ and MySQL 8.0+
+
+## Security Configuration
+
+**IMPORTANT**: Never use default credentials in production!
+
+1. Copy `.env.example` to `.env`
+2. Set strong passwords and encryption keys:
+   ```bash
+   DB_PASSWORD=YourStrongPassword123!
+   ENCRYPTION_KEY=YourSecure32CharEncryptionKey!
+   ```
 
 ## Getting Started
 
@@ -39,21 +50,23 @@ RMS follows REST principles. The table below outlines the HTTP methods implement
 
 The easiest way to build and deploy RMS is using Docker:
 
-1. **Build the project**:
+1. **Configure environment variables**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your secure credentials
+   ```
+
+2. **Build the project**:
    ```bash
    mvn package
    ```
 
-2. **Run with Docker**:
+3. **Run with Docker Compose**:
    ```bash
-   # Build the image
-   docker build -t richkware-manager-server .
-   
-   # Run the container
-   docker run -d -p 8080:8080 --name rms richkware-manager-server
+   docker-compose up -d
    ```
 
-3. **Access RMS**:
+4. **Access RMS**:
    Open [http://localhost:8080/Richkware-Manager-Server/](http://localhost:8080/Richkware-Manager-Server/) in your browser.
 
 ### Manual Deployment
@@ -66,13 +79,15 @@ The easiest way to build and deploy RMS is using Docker:
    - `database.password`: Database password (default: `richk`)
    - `encryptionkey`: Key used to encrypt messages exchanged with Richkware and RMC (default: `richktest`). **Important**: If you change this, you must update the configuration in the malware and client as well.
 
-2. **Build the WAR file**:
-   ```bash
-   mvn package
-   ```
+2. **Deploy**:
+   Copy the generated WAR file to the `webapps` directory of your Tomcat server.
 
-3. **Deploy**:
-   Copy the generated WAR file (e.g., `target/Richkware-Manager-Server.war`) to the `webapps` directory of your Tomcat server.
+3. **Set environment variables** (required):
+   ```bash
+   export DB_HOST=localhost
+   export DB_PASSWORD=YourSecurePassword
+   export ENCRYPTION_KEY=YourSecureKey
+   ```
 
 ## IDE Support
 
