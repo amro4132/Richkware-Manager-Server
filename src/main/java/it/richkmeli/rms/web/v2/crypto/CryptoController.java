@@ -10,6 +10,7 @@ import it.richkmeli.jframework.network.tcp.server.http.util.JServletException;
 import it.richkmeli.rms.data.entity.device.DeviceDatabaseModel;
 import it.richkmeli.rms.data.entity.rmc.model.Rmc;
 import it.richkmeli.rms.data.entity.user.UserRepository;
+import it.richkmeli.rms.data.entity.user.model.User;
 import it.richkmeli.rms.web.util.RMSServletManager;
 import it.richkmeli.rms.web.util.RMSSession;
 import it.richkmeli.rms.web.util.RMSStatusCode;
@@ -32,11 +33,13 @@ public class CryptoController {
     private static final long serialVersionUID = 1L;
     private static final int keyLength = 32;
     private final String password;
+    private UserRepository userRepository;
     SecureConnectionJob secureConnection = new SecureConnectionJob() {
         RMSSession rmsSession;
 
         @Override
-        protected void doBeforeCryptoAction(HttpServletRequest request, HttpServletResponse response, String clientID) throws Exception {
+        protected void doBeforeCryptoAction(HttpServletRequest request, HttpServletResponse response, String clientID)
+                throws Exception {
             RMSServletManager rmsServletManager = new RMSServletManager(request, response);
             rmsSession = rmsServletManager.getRMSServerSession();
 
@@ -45,24 +48,30 @@ public class CryptoController {
 
         @Override
         protected void doFinalCryptoAction() throws Exception {
-
-            //TODO fare controllo se rmcId è già presente. se sì, allora non fare la add
-            if (rmsSession.getRmcID() != null) {
-                if (!rmsSession.getRmcDatabaseManager().checkRmc(rmsSession.getRmcID())) {
-                    rmsSession.getRmcDatabaseManager().addRMC(new Rmc(null, rmsSession.getRmcID()));
+            // only add RMC to database if it's associated with a logged-in user
+            // anonymous secure connections are handled by JFramework SecureDataManager
+            String userEmail = rmsSession.getUserID();
+            if (rmsSession.getRmcID() != null && userEmail != null) {
+                User user = userRepository.findUserByEmail(userEmail);
+                if (user != null) {
+                    if (!rmsSession.getRmcDatabaseManager().checkRmc(rmsSession.getRmcID())) {
+                        rmsSession.getRmcDatabaseManager().addRMC(new Rmc(user, rmsSession.getRmcID()));
+                    }
                 }
             }
         }
     };
 
     CryptoController(UserRepository userRepository) {
+        this.userRepository = userRepository;
         password = ResourceBundle.getBundle("configuration").getString("encryptionkey");
     }
 
-
-    @RequestMapping(name = "SecureConnection", path = "/SecureConnection", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(name = "SecureConnection", path = "/SecureConnection", method = { RequestMethod.GET,
+            RequestMethod.POST })
     public void deleteRmc() throws ServletException, IOException {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         HttpServletResponse response = servletRequestAttributes.getResponse();
 
@@ -80,7 +89,8 @@ public class CryptoController {
      */
     @GetMapping(name = "encryptionKey", path = "/encryptionKey")
     public void getEncryptionKey() {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         HttpServletResponse response = servletRequestAttributes.getResponse();
 
@@ -107,7 +117,7 @@ public class CryptoController {
         } catch (AuthDatabaseException e) {
             AuthServletManager.print(response, new KoResponse(RMSStatusCode.DB_ERROR, e.getMessage()));
         } catch (Exception e) {
-            //e.printStackTrace();
+            // e.printStackTrace();
             AuthServletManager.print(response, new KoResponse(RMSStatusCode.GENERIC_ERROR, e.getMessage()));
         }
     }
