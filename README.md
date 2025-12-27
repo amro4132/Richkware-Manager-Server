@@ -32,30 +32,46 @@ RMS has been developed following the REST principles; the following table shows 
 
 ## Requirements
 These are the base requirements to build and use Richkware:
-
--   Java 1.8 or higher
--   MySQL
-
-## Get Started
-
-Open the configuration file (/src/main/resources/configuration.properties) and set the parameters inside it. In particular:
-
-- __database.url__: address of the database, RMS supports MySQL, if you want to use another one, it may not work. (default: jdbc:mysql://db:3306/)
-- __database.username__: username used to access to the database (default: root)
-- __database.password__: password used to access to the database (default: richk)
-- __encryptionkey__: encryption key used to exchange message to Richkware and RMC. if you change this parameter, remember to change also the configurations in Richkware and RMC (default: richktest)
-
-now we can build the "war" file, executing the following command:
-    
-    mvn package
-
-then you can deploy RMS using __docker-compose__
-
-    docker-compose up
-
-finally, you can open [RMS](http://0.0.0.0:8080/Richkware-Manager-Server/).
-
-## IDE
+ 
+ -   **Java 11** or higher
+ -   MySQL (only if running without Docker)
+ 
+ ## Get Started
+ 
+ ### Using Docker (Recommended)
+ 
+ You can build and deploy RMS easily using Docker:
+ 
+ 1.  Build the project:
+     ```bash
+     mvn package
+     ```
+ 
+ 2.  Run with Docker:
+     ```bash
+     docker build -t richkware-manager-server .
+     docker run -d -p 8080:8080 --name rms richkware-manager-server
+     ```
+ 
+ 3.  Access RMS at [http://localhost:8080/Richkware-Manager-Server/](http://localhost:8080/Richkware-Manager-Server/)
+ 
+ 
+ ### Manual Deployment
+ 
+ Open the configuration file (`/src/main/resources/configuration.properties`) and set the parameters inside it.
+ 
+ - __database.url__: address of the database (default: jdbc:mysql://db:3306/)
+ - __database.username__: username used to access to the database (default: root)
+ - __database.password__: password used to access to the database (default: richk)
+ - __encryptionkey__: encryption key used to exchange message to Richkware and RMC. if you change this parameter, remember to change also the configurations in Richkware and RMC (default: richktest)
+ 
+ Then build the "war" file:
+     
+     mvn package
+ 
+ And deploy it to a Tomcat server (Tomcat 9+ recommended).
+ 
+ ## IDE
 
 This project is developed with Intellij IDEA.
 [Open Sources Licences](https://www.jetbrains.com/opensource/) provided by JetBrains.

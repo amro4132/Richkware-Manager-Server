@@ -1,17 +1,18 @@
-#FROM mdelapenya/tomcat-mysql:7.0.77
-#RUN rm -rf webapps/ROOT/*
-#COPY out/artifacts/PTOexploded/* webapps/ROOT/
+# Base image with Tomcat 9 and JRE 11
+FROM tomcat:9.0-jdk11-openjdk
 
-#FROM mysql:5.5
-#FROM tomcat:7
-MAINTAINER Richk <richkmeli@gmail.com>
+# Deprecated maintainer instruction replacement
+LABEL maintainer="Richk <richkmeli@gmail.com>"
 
-CMD mysql -u root -p richk
+# Remove default Tomcat apps
+RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
 
-CMD rm -rf /usr/local/tomcat/webapps/ROOT/*
-COPY out/artifacts/Richkware-Manager-Server_E/* /usr/local/tomcat/webapps/ROOT/
+# Copy the built WAR file to Tomcat webapps directory
+COPY target/*.war /usr/local/tomcat/webapps/Richkware-Manager-Server.war
 
-#CMD service tomcat restart
+
+EXPOSE 8080
+
 
 EXPOSE 3306:3306
 EXPOSE 8080:80
