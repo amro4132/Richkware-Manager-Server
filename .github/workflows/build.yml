@@ -56,6 +56,7 @@ jobs:
         name: test-results
         path: target/surefire-reports/
     
+    # NOTE: Formal GitHub Releases are only triggered by pushing a tag (e.g. v1.1.5)
     - name: Build Docker image
       if: success()
       run: docker build -t rms:${{ github.sha }} .
