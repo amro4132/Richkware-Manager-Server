@@ -1,0 +1,24 @@
+.dockerignore
+.git
+.github
+.idea
+.vscode
+*.iml
+*.log
+/.mvn/wrapper/maven-wrapper.jar
+**/node_modules
+**/dist
+README.md
+
+# Include built WAR so we can copy it into the image
+!target/Richkware-Manager-Server.war
+.git
+.github
+.idea
+.vscode
+*.iml
+*.log
+/.mvn/wrapper/maven-wrapper.jar
+**/node_modules
+**/dist
+README.md

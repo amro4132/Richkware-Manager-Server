@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
+@Table(name = "app_user")
 public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

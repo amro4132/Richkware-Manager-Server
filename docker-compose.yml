@@ -1,55 +1,45 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: richkware
+      POSTGRES_USER: ${DB_USERNAME:-richk}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "8080:8080"
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-richk}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USERNAME=richk
-      - DB_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-ChangeThisSecureKey123!}
-      # Expose actuator endpoints so Docker healthchecks can use /actuator/health
-      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
-      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-      # disable SSL inside the container (we serve plain HTTP on 8080 in docker)
-      - SERVER_SSL_ENABLED=false
-      - SERVER_HTTP_PORT=8081
-      # Expose app at root context path (no /Richkware-Manager-Server prefix)
-      - SERVER_SERVLET_CONTEXT_PATH=/
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-richk}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
     restart: unless-stopped
     healthcheck:
-      # check the actuator health endpoint on the mapped port
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - mysql_data:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
-      - MYSQL_DATABASE=richkware
-      - MYSQL_USER=richk
-      - MYSQL_PASSWORD=${DB_PASSWORD:-SecurePassword123!}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
-  mysql_data:
+  db_data:
