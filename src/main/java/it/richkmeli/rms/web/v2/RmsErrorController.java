@@ -18,20 +18,8 @@ public class RmsErrorController implements ErrorController {
 
         if (status != null) {
             Integer statusCode = Integer.valueOf(status.toString());
-
             Logger.error("Error, HttpStatus: " + statusCode);
-            /*if(statusCode == HttpStatus.NOT_FOUND.value()) {
-                return "error.html-404";
-            }
-            else if(statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                return "error.html-500";
-            }*/
         }
         return "/html/index.html";
-    }
-
-    @Override
-    public String getErrorPath() {
-        return "/error";
     }
 }
