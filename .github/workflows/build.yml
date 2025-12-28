@@ -3,6 +3,7 @@ name: Build and Test
 on:
   push:
     branches: [ master, main, develop ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ master, main ]
 
@@ -58,3 +59,30 @@ jobs:
     - name: Build Docker image
       if: success()
       run: docker build -t rms:${{ github.sha }} .
+
+    - name: Upload Release Artifacts
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-war
+        path: target/Richkware-Manager-Server.war
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Release Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-war
+          path: release/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.war
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
