@@ -1,5 +1,6 @@
 package it.richkmeli.rms.data.entity.rmc.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import it.richkmeli.rms.data.entity.user.model.User;
 import org.hibernate.validator.constraints.Length;
 
@@ -9,7 +10,8 @@ import javax.persistence.*;
 @IdClass(RmcId.class)
 public class Rmc {
     @Id
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private User associatedUser;
     @Id
     @Length(max = 68)

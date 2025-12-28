@@ -25,7 +25,7 @@ public class Device {
     private String encryptionKey;
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-    @JoinColumn(name="user_email")
+    @JoinColumn(name = "user_email")
     private User associatedUser;
     @Length(max = 1000)
     private String commands;
@@ -33,11 +33,11 @@ public class Device {
     private String commandsOutput;
     @Length(max = 64)
     private String installationId;
-    @OneToOne(mappedBy = "device", fetch = FetchType.LAZY, cascade = {CascadeType.ALL}/*, orphanRemoval = true*/)
+    @OneToOne(mappedBy = "device", fetch = FetchType.LAZY, cascade = { CascadeType.ALL }/* , orphanRemoval = true */)
     @PrimaryKeyJoinColumn
     @JsonBackReference
     private Location location;
-    @OneToOne(mappedBy = "device", fetch = FetchType.LAZY, cascade = {CascadeType.ALL}/*, orphanRemoval = true*/)
+    @OneToOne(mappedBy = "device", fetch = FetchType.LAZY, cascade = { CascadeType.ALL }/* , orphanRemoval = true */)
     @PrimaryKeyJoinColumn
     @JsonBackReference
     private DeviceInfo deviceInfo;
@@ -45,7 +45,9 @@ public class Device {
     public Device() {
     }
 
-    public Device(String name, String ip, String serverPort, String lastConnection, String encryptionKey, User associatedUser, String commands, String commandsOutput, String installationId, Location location, DeviceInfo deviceInfo) {
+    public Device(String name, String ip, String serverPort, String lastConnection, String encryptionKey,
+            User associatedUser, String commands, String commandsOutput, String installationId, Location location,
+            DeviceInfo deviceInfo) {
         this.name = name;
         this.ip = ip;
         this.serverPort = serverPort;
@@ -155,19 +157,32 @@ public class Device {
         this.deviceInfo = deviceInfo;
     }
 
-    // called by the serialization, location is not serialized due to JsonBackReference
+    // called by the serialization, location is not serialized due to
+    // JsonBackReference
     public String getLocationAsPosition() {
-        return GeoLocation.getPositionFromCoordinates(location.getLongitude(), location.getLatitude(), location.getAltitude());
+        if (location != null) {
+            return GeoLocation.getPositionFromCoordinates(location.getLongitude(), location.getLatitude(),
+                    location.getAltitude());
+        }
+        return "N/A";
     }
 
-    // called by the serialization, location is not serialized due to JsonBackReference
+    // called by the serialization, location is not serialized due to
+    // JsonBackReference
     public String getAssociatedUserEmail() {
-        return associatedUser.getEmail();
+        if (associatedUser != null) {
+            return associatedUser.getEmail();
+        }
+        return "N/A";
     }
 
-    // called by the serialization, location is not serialized due to JsonBackReference
+    // called by the serialization, location is not serialized due to
+    // JsonBackReference
     public String getDeviceInfoDevName() {
-        return deviceInfo.getDevName();
+        if (deviceInfo != null) {
+            return deviceInfo.getDevName();
+        }
+        return "N/A";
     }
 
     @Override

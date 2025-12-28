@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jframework.version>1.2.16</jframework.version>
+        <jframework.version>1.2.17</jframework.version>
         <webjars-bootstrap.version>5.3.3</webjars-bootstrap.version>
         <webjars-jquery.version>3.7.1</webjars-jquery.version>
         <webjars-font-awesome.version>6.5.2</webjars-font-awesome.version>

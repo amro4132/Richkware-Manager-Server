@@ -32,76 +32,86 @@ public class TestController {
 
     public static void loadRandomTest(RMSSession rmsSession) {
         try {
-            rmsSession.getAuthDatabaseManager().addUser(new User("richk@i.it", "00000000", true));
-            rmsSession.getAuthDatabaseManager().addUser(new User("er@fv.it", "00000000", false));
-            //TODO da spostare nella creazione della tabella
-            rmsSession.getAuthDatabaseManager().addUser(new User("", "00000000", false));
-            rmsSession.getAuthDatabaseManager().addUser(new User("richk@i.it", "00000000", true));
+            if (!rmsSession.getAuthDatabaseManager().isUserPresent("richk@i.it")) {
+                rmsSession.getAuthDatabaseManager().addUser(new User("richk@i.it", "00000000", true));
+            }
+            if (!rmsSession.getAuthDatabaseManager().isUserPresent("er@fv.it")) {
+                rmsSession.getAuthDatabaseManager().addUser(new User("er@fv.it", "00000000", false));
+            }
+            if (!rmsSession.getAuthDatabaseManager().isUserPresent("")) {
+                rmsSession.getAuthDatabaseManager().addUser(new User("", "00000000", false));
+            }
         } catch (AuthDatabaseException | ModelException e) {
-            e.printStackTrace();
             Logger.error("Session TEST USERS", e);
         }
 
         try {
-            it.richkmeli.rms.data.entity.user.model.User u1 = AuthDatabaseSpringManager.getInstance().findUserByEmail("richk@i.it");
-            it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance().findUserByEmail("er@fv.it");
-            rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick2", "43.34.43.34", "40", "20-10-18", "ckeroivervioeon", u1, "start##start##start", "","iid",null,null));
-            rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick3", "43.34.43.34", "40", "20-10-18", "ckeroivervioeon", u1, "", "","iid",null,null));
-            rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick1", "43.34.43.34", "40", "20-10-18", "ckeroivervioeon", u2, "", "","iid",null,null));
-            //used for reverse commands
-            rmsSession.getDeviceDatabaseManager().addDevice(new Device("DESKTOP-1EVF5Q8/win_10_desktop1", "172.24.9.142", "none", "20-10-18", "ckeroivervioeon", u1, "YzNSaGNuUT0jI2MzUmhjblE9IyNjM1JoY25RPQ==", "","iid",null,null));
+            it.richkmeli.rms.data.entity.user.model.User u1 = AuthDatabaseSpringManager.getInstance()
+                    .findUserByEmail("richk@i.it");
+            it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance()
+                    .findUserByEmail("er@fv.it");
+            if (u1 != null) {
+                rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick2", "43.34.43.34", "40", "20-10-18",
+                        "ckeroivervioeon", u1, "start##start##start", "", "iid", null, null));
+                rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick3", "43.34.43.34", "40", "20-10-18",
+                        "ckeroivervioeon", u1, "", "", "iid", null, null));
+                rmsSession.getDeviceDatabaseManager()
+                        .addDevice(new Device("DESKTOP-1EVF5Q8/win_10_desktop1", "172.24.9.142", "none", "20-10-18",
+                                "ckeroivervioeon", u1, "YzNSaGNuUT0jI2MzUmhjblE9IyNjM1JoY25RPQ==", "", "iid", null,
+                                null));
+            }
+            if (u2 != null) {
+                rmsSession.getDeviceDatabaseManager().addDevice(new Device("rick1", "43.34.43.34", "40", "20-10-18",
+                        "ckeroivervioeon", u2, "", "", "iid", null, null));
+            }
         } catch (AuthDatabaseException e) {
             Logger.error("Session TEST DEVICES", e);
         }
 
         try {
-            rmsSession.getAuthDatabaseManager().addUser(new User("richk@i.it", "00000000", true));
-            rmsSession.getAuthDatabaseManager().addUser(new User("er@fv.it", "00000000", false));
-            rmsSession.getAuthDatabaseManager().addUser(new User("", "00000000", false));
-            rmsSession.getAuthDatabaseManager().addUser(new User("richk@i.it", "00000000", true));
-        } catch (AuthDatabaseException | ModelException e) {
-            e.printStackTrace();
-            Logger.error("Session TEST USERS", e);
-        }
-
-        try {
-
-            for (int i = 0; i < 10; i++) {
-                User u = new User(RandomStringGenerator.generateAlphanumericString(8) + "@" + RandomStringGenerator.generateAlphanumericString(8) + "." + RandomStringGenerator.generateAlphanumericString(2),
-                        RandomStringGenerator.generateAlphanumericString(10),
-                        false);
-                rmsSession.getAuthDatabaseManager().addUser(u);
-                for (int i2 = 0; i2 < 5; i2++) {
-                    it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance().findUserByEmail(u.getEmail());
-                    rmsSession.getDeviceDatabaseManager().addDevice(new Device(RandomStringGenerator.generateAlphanumericString(8), "12.34.45.67", "8080", "20-10-2019", RandomStringGenerator.generateAlphanumericString(32), u2, "start##start##start##start", "","iid",null,null));
+            for (int i = 0; i < 5; i++) {
+                String email = RandomStringGenerator.generateAlphanumericString(8) + "@"
+                        + RandomStringGenerator.generateAlphanumericString(8) + "."
+                        + RandomStringGenerator.generateAlphanumericString(2);
+                User u = new User(email, RandomStringGenerator.generateAlphanumericString(10), false);
+                if (!rmsSession.getAuthDatabaseManager().isUserPresent(email)) {
+                    rmsSession.getAuthDatabaseManager().addUser(u);
+                    it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance()
+                            .findUserByEmail(email);
+                    for (int i2 = 0; i2 < 3; i2++) {
+                        rmsSession.getDeviceDatabaseManager()
+                                .addDevice(new Device(RandomStringGenerator.generateAlphanumericString(8),
+                                        "12.34.45.67", "8080", "20-10-2019",
+                                        RandomStringGenerator.generateAlphanumericString(32), u2,
+                                        "start##start##start##start", "", "iid", null, null));
+                    }
                 }
             }
-            rmsSession.getDeviceDatabaseManager().addDevice(new Device(RandomStringGenerator.generateAlphanumericString(8), "12.34.45.67", "8080", "20-10-2019", RandomStringGenerator.generateAlphanumericString(32), AuthDatabaseSpringManager.getInstance().findUserByEmail("asd@asd.com"), "", "WTJsaGJ3PT0=","iid",null,null));
         } catch (AuthDatabaseException | ModelException e) {
-            Logger.error("Session ", e);
+            Logger.error("Session RANDOM DATA", e);
         }
 
         try {
-            it.richkmeli.rms.data.entity.user.model.User u1 = AuthDatabaseSpringManager.getInstance().findUserByEmail("richk@i.it");
-            it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance().findUserByEmail("er@fv.it");
-            Rmc rmc1 = new Rmc(u1, "test_rmc_ID");
-            Rmc rmc2 = new Rmc(u2, "test_rmc_ID_2");
-            Rmc rmc3 = new Rmc(u2, "test_rmc_ID_3");
-            Rmc rmc4 = new Rmc(null, "test_rmc_ID_3");
-
-            rmsSession.getRmcDatabaseManager().addRMC(rmc1);
-            rmsSession.getRmcDatabaseManager().addRMC(rmc2);
-            rmsSession.getRmcDatabaseManager().addRMC(rmc3);
-            rmsSession.getRmcDatabaseManager().addRMC(rmc4);
+            it.richkmeli.rms.data.entity.user.model.User u1 = AuthDatabaseSpringManager.getInstance()
+                    .findUserByEmail("richk@i.it");
+            it.richkmeli.rms.data.entity.user.model.User u2 = AuthDatabaseSpringManager.getInstance()
+                    .findUserByEmail("er@fv.it");
+            if (u1 != null) {
+                rmsSession.getRmcDatabaseManager().addRMC(new Rmc(u1, "test_rmc_ID"));
+            }
+            if (u2 != null) {
+                rmsSession.getRmcDatabaseManager().addRMC(new Rmc(u2, "test_rmc_ID_2"));
+                rmsSession.getRmcDatabaseManager().addRMC(new Rmc(u2, "test_rmc_ID_3"));
+            }
         } catch (AuthDatabaseException e) {
-            Logger.error("Session ", e);
+            Logger.error("Session RMC DATA", e);
         }
-
     }
 
-    @GetMapping(name = "test", path = {"/test", "/Richkware-Manager-Server/test"})
+    @GetMapping(name = "test", path = { "/test", "/Richkware-Manager-Server/test" })
     public void getRmc() throws IOException, ServletException {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         HttpServletResponse response = servletRequestAttributes.getResponse();
 

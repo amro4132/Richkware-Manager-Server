@@ -19,11 +19,13 @@ public class RmcId implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         RmcId rmcId1 = (RmcId) o;
-        if (!associatedUser.equals(((RmcId) o).associatedUser)) return false;
-        return rmcId == rmcId1.rmcId;
+        return Objects.equals(associatedUser, rmcId1.associatedUser) &&
+                Objects.equals(rmcId, rmcId1.rmcId);
     }
 
     @Override
