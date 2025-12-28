@@ -1,19 +1,22 @@
-FROM tomcat:9.0-jdk17-temurin
+FROM eclipse-temurin:17-jre-alpine
 
 LABEL maintainer="Richk <richkmeli@gmail.com>"
 
-RUN rm -rf /usr/local/tomcat/webapps/ROOT/*
+WORKDIR /app
 
-COPY target/*.war /usr/local/tomcat/webapps/Richkware-Manager-Server.war
+COPY target/*.jar app.jar
 
 EXPOSE 8080
 
 ENV DB_HOST=db \
     DB_PORT=3306 \
-    DB_USERNAME=root \
+    DB_USERNAME=richk \
     DB_PASSWORD=changeme \
     ENCRYPTION_KEY=changeme \
-    DEBUG_MODE=false
+    DEBUG_MODE=false \
+    SPRING_PROFILES_ACTIVE=docker
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:8080/Richkware-Manager-Server/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

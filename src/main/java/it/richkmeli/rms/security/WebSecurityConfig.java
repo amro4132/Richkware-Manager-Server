@@ -18,40 +18,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        // Spring Security to require only HTTPS requests, commenting this code it enables both protocols.
-        //  httpSecurity.requiresChannel()
-        // .anyRequest()
-        // .requiresSecure();
-        // .requiresInsecure();
-
-        // bypass spring security, keeping jframework one
         httpSecurity
-                .csrf()
-                .disable()
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**", "/Richkware-Manager-Server/**")
-                .anonymous();
-/*
-        // accessible without authentication,
-        httpSecurity.authorizeRequests()
-                .antMatchers("/anonymous*")
-                .anonymous();
-
-        // login and signup pages
-        httpSecurity.authorizeRequests()
-                .antMatchers("/login*")
-                // .and()
-                // .formLogin()
-                // .loginPage("/login")
-                // .and()
-                // .logout()
-                .permitAll();
-
-        // accessible after a successful login
-        httpSecurity.authorizeRequests()
-                .anyRequest()
-                .authenticated();
-    */
+                .anyRequest().permitAll();
     }
 
 //    @Override

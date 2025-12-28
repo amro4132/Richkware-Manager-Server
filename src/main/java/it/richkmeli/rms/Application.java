@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @ServletComponentScan("it.richkmeli.rms.web")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "it.richkmeli.rms")
 public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
