@@ -23,15 +23,38 @@ jobs:
         distribution: 'temurin'
         cache: maven
     
-    - name: Configure Maven settings
+    - name: Configure Maven for GitHub Packages
       run: |
         mkdir -p ~/.m2
-        echo '<settings><servers><server><id>github</id><username>${{ github.actor }}</username><password>${{ secrets.GITHUB_TOKEN }}</password></server></servers></settings>' > ~/.m2/settings.xml
-    
-    - name: Build with Maven
-      run: mvn clean package -B -V
+        cat > ~/.m2/settings.xml << 'EOF'
+        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+          http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          <servers>
+            <server>
+              <id>github</id>
+              <username>x-access-token</username>
+              <password>${env.GITHUB_TOKEN}</password>
+            </server>
+          </servers>
+        </settings>
+        EOF
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
+    - name: Build with Maven
+      run: mvn clean verify -B -DskipTests=false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: target/surefire-reports/
+    
     - name: Build Docker image
-      run: docker build -t rms:test .
+      if: success()
+      run: docker build -t rms:${{ github.sha }} .
