@@ -16,7 +16,7 @@ public class RmcDatabaseSpringManager implements RmcDatabaseModel {
     }
 
     @Autowired
-    public RmcDatabaseSpringManager(RmcRepository rmcRepository){
+    public RmcDatabaseSpringManager(RmcRepository rmcRepository) {
         this.rmcRepository = rmcRepository;
     }
 
@@ -42,12 +42,19 @@ public class RmcDatabaseSpringManager implements RmcDatabaseModel {
 
     @Override
     public void removeRmcUserPair(Rmc client) throws AuthDatabaseException {
-        rmcRepository.deleteRmcByRmcIdAndAssociatedUser_Email(client.getRmcId(),client.getAssociatedUser().getEmail());
+        if (client.getAssociatedUser() != null) {
+            rmcRepository.deleteRmcByRmcIdAndAssociatedUser_Email(client.getRmcId(),
+                    client.getAssociatedUser().getEmail());
+        }
     }
 
     @Override
     public boolean checkRmcUserPair(Rmc client) throws AuthDatabaseException {
-        return rmcRepository.existsRmcByRmcIdAndAssociatedUser_Email(client.getRmcId(),client.getAssociatedUser().getEmail());
+        if (client.getAssociatedUser() != null) {
+            return rmcRepository.existsRmcByRmcIdAndAssociatedUser_Email(client.getRmcId(),
+                    client.getAssociatedUser().getEmail());
+        }
+        return false;
     }
 
     @Override
