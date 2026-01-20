@@ -26,14 +26,12 @@ function createDevicesTableHeader() {
 
     let thead = document.createElement("thead");
     let row = document.createElement("tr");
-    row.innerHTML = ( //"<th>Index</th>" +
+    row.innerHTML = (
         "<th>Name</th>" +
-        "<th>Device Info</th>" +
         "<th>Last Connection</th>" +
-        "<th>Last Location</th>" +
         "<th>Associated User</th>" +
         "<th>Commands</th>" +
-        //"<th>Commands Output</th>" +
+        "<th>Commands Output</th>" +
         "<th>Actions</th>");
 
     thead.appendChild(row);
@@ -70,9 +68,7 @@ function loadDevicesJSONtoTable(devicesListJSON) {
 
         var row = document.createElement("tr");
         row.id = "tableRow" + i;
-        var collapse = "<div class='collapse' id='coll-" + name + "' aria-labelledby='tableRow" + i + "'><table class='table'><tr><td>IP:Port</td><td>" + IP + ":" + serverPort + "</td></tr><tr><td>Ecryption Key</td><td> + encryptionKey + </td></tr></table></div>";
         row.innerHTML = (
-            //"<td>" + (index + 1) + "</td>" +
             "<td>" +
             "<a tabindex='0' type=\"button\" data-html=\"true\" class=\"btn btn-outline-info\" data-toggle=\"popover\" title='" + name + " Info' " +
             "   data-content=\"<div>" +
@@ -81,24 +77,17 @@ function loadDevicesJSONtoTable(devicesListJSON) {
             "       <p>Encryption Key: " + encryptionKey + "</p>" +
             "</div>\"> " + name + "</a>" +
             "</td>" +
-            //"<td><button class=\"btn\" data-toggle=\"collapse\" data-target=\"#coll-" + name + "\" aria-expanded=\"true\" aria-controls=\"coll-" + name +"\">" + name + "</button>" +
-            "<td>" + deviceInfo + "</td>" +
             "<td>" + timeSinceNow + "</td>" +
-            "<td>" + location + "</td>" +
             "<td>" + associatedUser + "</td>" +
+            "<td>" + commands + "</td>" +
+            "<td>" + commandsOutput + "</td>" +
             "<td>" +
-            "<button tabindex='0' type=\"button\" data-html=\"true\" class=\"btn btn-secondary\" data-toggle=\"popover\" title='Commands' " +
-            "   data-content=\"<div>" +
-            "       <p>commands: " + commands + "</p>" +
-            "       <p>commandsOutput: " + commandsOutput + "</p>" +
-            "       <p><button title='Insert Commands' type='button' id='manage#" + name + "' class='btn btn-secondary' onclick=commandsM('" + name + "') ><span class='fa fa-terminal'></span></button></p>" +
-            "       <p><button title='Output' type='button' id='commandsOutput#" + name + "' class='btn btn-primary' onclick=outputM('" + name + "') ><span class='fa fa-eye'></span></button></p>" +
-            "</div>\"><span class=\"fa fa-terminal\"></span></button>" +
-            "</td>" +
-            "<td><button title='Remove' type=\"button\" id=\"remove#" + name + "#" + i + "\" class=\"btn btn-danger\" onclick=\"deleteDevice('" + name + "', '" + i + "')\"><span class=\"fa fa-trash\"></span></button></td>");
+            "<button title='Insert Commands' aria-label='Insert Commands' type='button' class='btn btn-secondary' onclick=commandsM('" + name + "')><span class='fa fa-terminal'></span></button> " +
+            "<button title='View Output' aria-label='View Output' type='button' class='btn btn-primary' onclick=outputM('" + name + "')><span class='fa fa-eye'></span></button> " +
+            "<button title='Remove Device' aria-label='Remove Device' type=\"button\" class=\"btn btn-danger\" onclick=\"deleteDevice('" + name + "', '" + i + "')\"><span class=\"fa fa-trash\"></span></button>" +
+            "</td>");
 
         tbody.appendChild(row);
-        //      index++
     }
     devicesTable.appendChild(tbody);
     popInfo();
