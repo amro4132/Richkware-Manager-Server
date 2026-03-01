@@ -1,16 +1,15 @@
-# المرحلة الأولى: بناء التطبيق باستخدام Maven
-FROM maven:3.8.4-openjdk-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-# المرحلة الثانية: تشغيل التطبيق باستخدام Tomcat
+# استخدام نسخة Tomcat جاهزة
 FROM tomcat:9-jdk17
 WORKDIR /usr/local/tomcat
+
+# حذف الملفات الافتراضية
 RUN rm -rf webapps/*
 
-# نسخ الملف الناتج من مرحلة البناء إلى Tomcat
-COPY --from=build /app/target/Richkware-Manager-Server.war webapps/ROOT.war
+# تحميل الملف الجاهز مباشرة من رابط المبرمج الأصلي (Releases)
+ADD https://github.com/richkmeli/Richkware-Manager-Server/releases/download/v1.1.5/Richkware-Manager-Server.war webapps/ROOT.war
 
+# فتح المنفذ 8080
 EXPOSE 8080
+
+# تشغيل السيرفر
 CMD ["catalina.sh", "run"]
